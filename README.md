@@ -1,6 +1,5 @@
 # Raphael
 
-> **Cognitive Advisor & Focus HUD for KDE Plasma**
 
 [![Version](https://img.shields.io/badge/version-1.0.0-cyan?style=flat-square&logo=data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNCAyNCI+PC9zdmc+)](https://github.com/yourusername/raphael/releases)
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue?style=flat-square&logo=python&logoColor=white)](https://www.python.org/downloads/)
