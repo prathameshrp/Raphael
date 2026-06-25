@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAPHAEL // COGNITIVE CONTROL MATRIX</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #08080f;
+            --panel-bg: rgba(17, 17, 27, 0.75);
+            --border-color: rgba(180, 190, 254, 0.15);
+            --border-hover: rgba(180, 190, 254, 0.35);
+            --accent-purple: #cba6f7;
+            --accent-blue: #89b4fa;
+            --accent-green: #a6e3a1;
+            --accent-red: #f38ba8;
+            --accent-yellow: #f9e2af;
+            --text-main: #cdd6f4;
+            --text-muted: #6c7086;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: radial-gradient(circle at top right, #181825, #08080f);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1.5rem;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--accent-green);
+            box-shadow: 0 0 10px var(--accent-green);
+            animation: pulse 2s infinite;
+        }
+
+        h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            font-family: 'Fira Code', monospace;
+            background: linear-gradient(to right, var(--accent-purple), var(--accent-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .session-selector {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-family: 'Outfit', sans-serif;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .session-selector:hover {
+            border-color: var(--accent-purple);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--accent-purple);
+            opacity: 0.7;
+        }
+
+        .metric-card.focus::before { background: var(--accent-green); }
+        .metric-card.distract::before { background: var(--accent-red); }
+        .metric-card.efficiency::before { background: var(--accent-blue); }
+
+        .metric-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--border-hover);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .metric-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-family: 'Fira Code', monospace;
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .charts-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            backdrop-filter: blur(12px);
+            transition: border-color 0.3s ease;
+        }
+
+        .panel:hover {
+            border-color: var(--border-hover);
+        }
+
+        .panel-header {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent-purple);
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        .details-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .ai-insights-panel {
+            grid-column: span 2;
+            background: linear-gradient(135deg, rgba(30, 30, 46, 0.7), rgba(17, 17, 27, 0.8));
+            border: 1px solid rgba(203, 166, 247, 0.2);
+            position: relative;
+        }
+
+        .ai-insights-panel::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: radial-gradient(circle, rgba(203, 166, 247, 0.1) 0%, rgba(0,0,0,0) 70%);
+            pointer-events: none;
+        }
+
+        .ai-content {
+            font-size: 1rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            white-space: pre-wrap;
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-main);
+        }
+
+        .ai-insight-item {
+            background: rgba(255,255,255,0.02);
+            border-left: 2px solid var(--accent-purple);
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-blue));
+            color: #11111b;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            outline: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(203, 166, 247, 0.4);
+        }
+
+        .btn:disabled {
+            background: var(--text-muted);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .goals-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .goal-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: rgba(255,255,255,0.02);
+            padding: 0.75rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.03);
+            transition: all 0.2s ease;
+        }
+
+        .goal-item:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: rgba(203, 166, 247, 0.2);
+        }
+
+        .goal-checkbox {
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            accent-color: var(--accent-purple);
+            cursor: pointer;
+        }
+
+        .goal-text {
+            flex-grow: 1;
+            font-size: 0.95rem;
+        }
+
+        .add-goal-form {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .input-text {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            flex-grow: 1;
+            outline: none;
+            font-family: 'Outfit', sans-serif;
+            transition: border-color 0.3s ease;
+        }
+
+        .input-text:focus {
+            border-color: var(--accent-purple);
+        }
+
+        .rules-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .rule-item {
+            font-size: 0.9rem;
+            font-family: 'Fira Code', monospace;
+            background: rgba(180, 190, 254, 0.05);
+            padding: 0.6rem 1rem;
+            border-radius: 6px;
+            border-left: 2px solid var(--accent-blue);
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.6; }
+        }
+
+        .loading-ring {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #11111b;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo-container">
+            <div class="logo-indicator"></div>
+            <h1>RAPHAEL // COGNITIVE CONTROL MATRIX</h1>
+        </div>
+        <div>
+            <select class="session-selector" id="sessionSelect" onchange="switchSession()">
+                <option value="current">CURRENT SESSION</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="dashboard-grid">
+        <div class="metric-card focus">
+            <div class="metric-label">Focus Duration</div>
+            <div class="metric-value" id="focusTime">0m 0s</div>
+        </div>
+        <div class="metric-card distract">
+            <div class="metric-label">Distract Duration</div>
+            <div class="metric-value" id="distractTime">0m 0s</div>
+        </div>
+        <div class="metric-card efficiency">
+            <div class="metric-label">Focus Efficiency</div>
+            <div class="metric-value" id="efficiencyVal">100%</div>
+        </div>
+        <div class="metric-card">
+            <div class="metric-label">Telemetry Challenge Count</div>
+            <div class="metric-value" id="challengeCount">0</div>
+        </div>
+    </div>
+
+    <div class="charts-row">
+        <div class="panel">
+            <div class="panel-header">
+                <span>Focus Timeline Analysis</span>
+                <span id="sessionDate">Live Feed</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="timelineChart"></canvas>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="panel-header">Top Active Windows</div>
+            <div class="chart-container">
+                <canvas id="windowsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="details-grid">
+        <div class="panel ai-insights-panel">
+            <div class="panel-header">
+                <span>Cognitive Advisor Recommendations</span>
+                <button class="btn" id="generateInsightBtn" onclick="requestAiInsight()">
+                    <span id="btnText">Request Dynamic AI Feedback</span>
+                </button>
+            </div>
+            <div class="ai-content" id="aiFeedback">Click the button above to request real-time, personalized workspace feedback from Raphael.</div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">Suggested Milestones & Goals</div>
+            <ul class="goals-list" id="goalsList">
+                <!-- Goals dynamically loaded -->
+            </ul>
+            <form class="add-goal-form" onsubmit="addNewGoal(event)">
+                <input type="text" class="input-text" id="newGoalInput" placeholder="Define a new workflow goal..." required>
+                <button type="submit" class="btn">Add Goal</button>
+            </form>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">Active Behavioral Directives</div>
+            <div class="rules-list" id="rulesList">
+                <!-- Custom rules dynamically loaded -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let timelineChart = null;
+        let windowsChart = null;
+        let fullData = null;
+        let selectedSessionId = "current";
+
+        // Format duration helper
+        function formatDuration(totalSeconds) {
+            const h = Math.floor(totalSeconds / 3600);
+            const m = Math.floor((totalSeconds % 3600) / 60);
+            const s = totalSeconds % 60;
+            if (h > 0) return `${h}h ${m}m`;
+            return `${m}m ${s}s`;
+        }
+
+        async function fetchDashboardData() {
+            try {
+                const response = await fetch('/api/session_data');
+                fullData = await response.json();
+                populateSessionDropdown();
+                renderDashboard();
+            } catch (error) {
+                console.error("Failed to load dashboard statistics:", error);
+            }
+        }
+
+        function populateSessionDropdown() {
+            const select = document.getElementById('sessionSelect');
+            // Keep current session
+            select.innerHTML = '<option value="current">CURRENT SESSION (ACTIVE)</option>';
+            
+            if (fullData && fullData.past_sessions) {
+                fullData.past_sessions.forEach(sess => {
+                    const date = new Date(sess.start_time * 1000).toLocaleString();
+                    const option = document.createElement('option');
+                    option.value = sess.id;
+                    option.textContent = `Session: ${date} (${formatDuration(sess.focus_seconds + sess.distract_seconds)})`;
+                    select.appendChild(option);
+                });
+            }
+            select.value = selectedSessionId;
+        }
+
+        function switchSession() {
+            const select = document.getElementById('sessionSelect');
+            selectedSessionId = select.value;
+            renderDashboard();
+        }
+
+        function getActiveSession() {
+            if (selectedSessionId === "current") {
+                return fullData ? fullData.current_session : null;
+            }
+            return fullData ? fullData.past_sessions.find(s => s.id == selectedSessionId) : null;
+        }
+
+        function renderDashboard() {
+            const sess = getActiveSession();
+            if (!sess) return;
+
+            // Date context
+            const dateSpan = document.getElementById('sessionDate');
+            dateSpan.textContent = new Date(sess.start_time * 1000).toLocaleDateString();
+
+            // Populate core metrics
+            document.getElementById('focusTime').textContent = formatDuration(sess.focus_seconds);
+            document.getElementById('distractTime').textContent = formatDuration(sess.distract_seconds);
+            
+            const total = sess.focus_seconds + sess.distract_seconds;
+            const efficiency = total > 0 ? Math.round((sess.focus_seconds / total) * 100) : 100;
+            document.getElementById('efficiencyVal').textContent = `${efficiency}%`;
+            
+            // Adjust efficiency border color
+            const efficiencyCard = document.querySelector('.metric-card.efficiency');
+            if (efficiency >= 80) {
+                efficiencyCard.style.setProperty('--accent-blue', 'var(--accent-green)');
+            } else if (efficiency >= 50) {
+                efficiencyCard.style.setProperty('--accent-blue', 'var(--accent-yellow)');
+            } else {
+                efficiencyCard.style.setProperty('--accent-blue', 'var(--accent-red)');
+            }
+
+            document.getElementById('challengeCount').textContent = fullData.challengeCount || 0;
+
+            // Load insights cache if available
+            const insightsBox = document.getElementById('aiFeedback');
+            if (sess.ai_insights && sess.ai_insights.length > 0) {
+                const latest = sess.ai_insights[sess.ai_insights.length - 1].text;
+                renderAiInsights(latest);
+            } else {
+                insightsBox.innerHTML = `Click the button above to request real-time, personalized workspace feedback from Raphael.`;
+            }
+
+            // Populate Goals Checklist
+            const goalsBox = document.getElementById('goalsList');
+            goalsBox.innerHTML = '';
+            if (fullData.suggested_goals && fullData.suggested_goals.length > 0) {
+                fullData.suggested_goals.forEach(goal => {
+                    const li = document.createElement('li');
+                    li.className = 'goal-item';
+                    li.innerHTML = `
+                        <input type="checkbox" class="goal-checkbox" onclick="completeGoal('${goal.replace(/'/g, "\\'")}')">
+                        <span class="goal-text">${goal}</span>
+                    `;
+                    goalsBox.appendChild(li);
+                });
+            } else {
+                goalsBox.innerHTML = '<li class="goal-item" style="color: var(--text-muted)">All goals completed. Good job!</li>';
+            }
+
+            // Populate Rules
+            const rulesBox = document.getElementById('rulesList');
+            rulesBox.innerHTML = '';
+            if (fullData.custom_rules && fullData.custom_rules.length > 0) {
+                fullData.custom_rules.forEach(rule => {
+                    const div = document.createElement('div');
+                    div.className = 'rule-item';
+                    div.textContent = `• ${rule}`;
+                    rulesBox.appendChild(div);
+                });
+            } else {
+                rulesBox.innerHTML = '<div class="rule-item" style="color: var(--text-muted)">No custom directives configured.</div>';
+            }
+
+            // Build Charts
+            renderTimelineChart(sess);
+            renderWindowsChart(sess);
+        }
+
+        function renderAiInsights(rawText) {
+            const container = document.getElementById('aiFeedback');
+            container.innerHTML = '';
+            
+            // Format bullet points
+            const lines = rawText.split('\n');
+            lines.forEach(line => {
+                const trimmed = line.trim();
+                if (trimmed.startsWith('-') || trimmed.startsWith('*') || /^\d+\./.test(trimmed) || trimmed.includes(':')) {
+                    const item = document.createElement('div');
+                    item.className = 'ai-insight-item';
+                    item.textContent = trimmed.replace(/^[-*\d.]\s*/, '');
+                    container.appendChild(item);
+                } else if (trimmed) {
+                    const p = document.createElement('p');
+                    p.style.marginBottom = '0.5rem';
+                    p.textContent = trimmed;
+                    container.appendChild(p);
+                }
+            });
+        }
+
+        async function requestAiInsight() {
+            const btn = document.getElementById('generateInsightBtn');
+            const btnText = document.getElementById('btnText');
+            btn.disabled = true;
+            btnText.innerHTML = '<span class="loading-ring"></span> Analyzing workspace...';
+
+            try {
+                const response = await fetch('/api/generate_dashboard_insight');
+                const data = await response.json();
+                renderAiInsights(data.insight);
+                // Refresh local data cache
+                await fetchDashboardData();
+            } catch (error) {
+                document.getElementById('aiFeedback').textContent = "Failed to coordinate dynamic feedback request.";
+            } finally {
+                btn.disabled = false;
+                btnText.textContent = "Request Dynamic AI Feedback";
+            }
+        }
+
+        async function completeGoal(goalText) {
+            try {
+                const response = await fetch('/api/complete_goal', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ goal: goalText })
+                });
+                if (response.ok) {
+                    fetchDashboardData();
+                }
+            } catch (error) {
+                console.error("Failed to complete goal:", error);
+            }
+        }
+
+        async function addNewGoal(event) {
+            event.preventDefault();
+            const input = document.getElementById('newGoalInput');
+            const goalText = input.value.trim();
+            if (!goalText) return;
+
+            try {
+                const response = await fetch('/api/add_goal', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ goal: goalText })
+                });
+                if (response.ok) {
+                    input.value = '';
+                    fetchDashboardData();
+                }
+            } catch (error) {
+                console.error("Failed to add new goal:", error);
+            }
+        }
+
+        function renderTimelineChart(sess) {
+            const ctx = document.getElementById('timelineChart').getContext('2d');
+            if (timelineChart) timelineChart.destroy();
+
+            // Prepare time series labels and data
+            const labels = [];
+            const focusData = [];
+            const distractData = [];
+            
+            let cumFocus = 0;
+            let cumDistract = 0;
+
+            if (sess.timeline && sess.timeline.length > 0) {
+                sess.timeline.forEach((item, index) => {
+                    const time = new Date(item.timestamp * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    labels.push(time);
+                    
+                    if (item.status === 'focused') {
+                        cumFocus += item.duration / 60; // in minutes
+                    } else {
+                        cumDistract += item.duration / 60;
+                    }
+                    focusData.push(parseFloat(cumFocus.toFixed(1)));
+                    distractData.push(parseFloat(cumDistract.toFixed(1)));
+                });
+            } else {
+                labels.push("Start");
+                focusData.push(0);
+                distractData.push(0);
+            }
+
+            timelineChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Cumulative Focus Time (min)',
+                            data: focusData,
+                            borderColor: '#a6e3a1',
+                            backgroundColor: 'rgba(166, 227, 161, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        },
+                        {
+                            label: 'Cumulative Distract Time (min)',
+                            data: distractData,
+                            borderColor: '#f38ba8',
+                            backgroundColor: 'rgba(243, 139, 168, 0.1)',
+                            fill: true,
+                            tension: 0.3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6c7086' } },
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#6c7086' } }
+                    },
+                    plugins: {
+                        legend: { labels: { color: '#cdd6f4', font: { family: 'Outfit' } } }
+                    }
+                }
+            });
+        }
+
+        function renderWindowsChart(sess) {
+            const ctx = document.getElementById('windowsChart').getContext('2d');
+            if (windowsChart) windowsChart.destroy();
+
+            const rawData = sess.window_durations || {};
+            // Sort windows by duration desc, take top 5
+            const sorted = Object.entries(rawData)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            const labels = sorted.map(e => e[0].length > 25 ? e[0].substring(0, 22) + '...' : e[0]);
+            const data = sorted.map(e => Math.round(e[1] / 60)); // convert to minutes
+
+            if (sorted.length === 0) {
+                labels.push("No Active Windows Logged");
+                data.push(0);
+            }
+
+            windowsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#cba6f7',
+                            '#89b4fa',
+                            '#a6e3a1',
+                            '#f9e2af',
+                            '#f38ba8'
+                        ],
+                        borderWidth: 1,
+                        borderColor: '#11111b'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#cdd6f4', font: { family: 'Outfit', size: 10 } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return ` ${context.label}: ${context.raw} min`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Auto refresh telemetry every 5 seconds
+        setInterval(fetchDashboardData, 5000);
+        // Initial load
+        fetchDashboardData();
+    </script>
+</body>
+</html>

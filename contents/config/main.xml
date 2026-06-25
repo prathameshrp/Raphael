@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0">
+  <kcfgfile name=""/>
+  <group name="General">
+    <entry name="displayDuration" type="Int">
+      <default>12</default>
+    </entry>
+    <entry name="caringLevel" type="Int">
+      <default>3</default>
+    </entry>
+    <entry name="aiWindowTracking" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="proactiveInterventions" type="Bool">
+      <default>true</default>
+    </entry>
+    <entry name="escalationTimeout" type="Int">
+      <default>60</default>
+    </entry>
+    <entry name="activeMonitoring" type="Bool">
+      <default>true</default>
+    </entry>
+  </group>
+</kcfg>

@@ -1,0 +1,15 @@
+{
+    "KPlugin": {
+        "Id": "raphael",
+        "Name": "Raphael",
+        "Description": "ADHD Context tracker and Raphael cognitive advisor",
+        "Version": "2.0",
+        "License": "MIT",
+        "Authors": [{ "Name": "Prathamesh" }],
+        "Category": "Utilities"
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0",
+    "X-Plasma-FormFactors": "desktop",
+    "X-Plasma-NotificationArea": "false"
+}

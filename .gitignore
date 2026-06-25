@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.cache/
+venv/
+.env
+
+# Local Daemon Telemetry, Logging & Cache
+*.log
+daemon.log
+contents/ui/daemon/screenshot.png
+contents/ui/daemon/raphael_history.json
+
+# Local User Memory (contains personal stats, rules, and window logs)
+contents/ui/daemon/raphael_memory.json
+
+# System & OS
+.DS_Store
+Thumbs.db
