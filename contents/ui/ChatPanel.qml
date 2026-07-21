@@ -6,7 +6,7 @@ ColumnLayout {
     spacing: 8
     
     Label {
-        text: "ALERT: Distraction vector verified. State your intent:"
+        text: "Distraction detected. State your reason:"
         color: "#FF8888"
         font.bold: true
         font.pointSize: 9
@@ -17,7 +17,7 @@ ColumnLayout {
         TextField {
             id: inputReason
             Layout.fillWidth: true
-            placeholderText: "Enter rational educational verification protocol..."
+            placeholderText: "Explain why you switched tasks..."
             color: "#FFFFFF"
             background: Rectangle { color: "#222222"; radius: 3 }
             onAccepted: submitReason()

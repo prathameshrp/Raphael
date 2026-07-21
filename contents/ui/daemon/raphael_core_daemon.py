@@ -387,7 +387,7 @@ def update_persistent_memory_on_disk(force=False):
     
     Generate:
     1. A short, caring summary (2 sentences) of what was achieved in this session and what to focus on next. Address the user by their learned name '{get_user_name()}' if available. Do not use colloquial terms like 'bhai' or 'yaar'.
-    2. 3 concrete suggested tactical targets/goals for their next session.
+    2. 3 concrete suggested goals for their next session.
     
     Respond in JSON format matching this schema:
     {{"summary": "your 2-sentence summary", "suggested_goals": ["goal 1", "goal 2", "goal 3"]}}
@@ -868,7 +868,7 @@ def handle_chat_v4():
                         
                         CRITICAL requirements:
                         1. Keep the response under 3 sentences.
-                        2. Be highly analytical, caring, and cockpit-advisor-like in tone.
+                        2. Be highly analytical, supportive, and direct in tone.
                         3. Return the response as a single, continuous paragraph (single line of text) with NO newlines, paragraph breaks, or line breaks of any kind.
                         4. Do NOT hallucinate or assume details not present in the image. Base your response strictly on the visible workspace.
                         """
@@ -1003,7 +1003,7 @@ def handle_telemetry_v3():
     # Check if window suggests reading or coding to update insight
     if any(x in window.lower() for x in ["pdf", "okular", "zotero", "epub", "book", "reader", "kindle"]):
         state_engine["insight"] = {
-            "label": "Reading Protocol Active",
+            "label": "Reading Mode",
             "src": "Document Feed",
             "text": f"Reading detected on '{window}'. If you encounter complex concepts or need notes summarized, just ask me to explain them!",
             "tag": "reading"
@@ -1011,21 +1011,21 @@ def handle_telemetry_v3():
     elif any(x in window.lower() for x in ["visual studio code", "vscode", "code - oss", "terminal", "console", "kitty", "alacritty", "konsole"]):
         state_engine["insight"] = {
             "label": "Development Stream",
-            "src": "IDE Matrix",
+            "src": "IDE",
             "text": "Active coding session. Remember to follow clean code guidelines. Ask me for optimization reviews or documentation templates if needed.",
             "tag": "focus"
         }
     elif "discord" in window.lower():
         state_engine["insight"] = {
-            "label": "Communication Vector",
+            "label": "Communication",
             "src": "Discord",
             "text": "Discord window is active. Chatting is whitelisted, but keep it brief to stay on track. Ask me if your friends say anything questionable!",
             "tag": "pattern"
         }
     elif state_engine["metrics"]["current_status"] == "Taking a break":
         state_engine["insight"] = {
-            "label": "Cognitive Drift Alert",
-            "src": "Telemetry",
+            "label": "Distraction Alert",
+            "src": "Monitor",
             "text": f"You have drifted to '{window}'. Explain to me why this is necessary to clear the distraction warning.",
             "tag": "distract"
         }
@@ -1038,8 +1038,8 @@ def handle_telemetry_v3():
         }
         
     response_data = state_engine.copy()
-    response_data["session_summary"] = session_memory.get("historical_context", "Resuming cognitive timeline parameters...")
-    response_data["session_goals"] = session_memory.get("suggested_goals", ["Calibrating focus vectors", "Loading milestones"])
+    response_data["session_summary"] = session_memory.get("historical_context", "Loading session summary...")
+    response_data["session_goals"] = session_memory.get("suggested_goals", ["Loading session goals..."])
     
     return jsonify(response_data)
 
@@ -1089,6 +1089,16 @@ def serve_dashboard():
         return make_response(content)
     else:
         return "Dashboard HTML template not found. Please verify placement.", 404
+
+@app.route("/hud", methods=["GET"])
+def serve_hud():
+    hud_path = os.path.expanduser("~/.local/share/plasma/plasmoids/raphael/contents/ui/daemon/hud.html")
+    if os.path.exists(hud_path):
+        with open(hud_path, 'r') as f:
+            content = f.read()
+        return make_response(content)
+    else:
+        return "HUD HTML template not found. Please verify placement.", 404
 
 @app.route("/api/session_data", methods=["GET"])
 def get_session_data():

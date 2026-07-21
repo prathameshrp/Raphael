@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Stoic Habit Tracker: Raphael Widget Setup & Orchestration Script
+# Raphael Widget Setup Script
 set -e
 
 WORKSPACE_DIR="/home/nyanyra/.local/share/plasma/plasmoids/raphael"
@@ -9,7 +9,7 @@ DAEMON_LOG="${WORKSPACE_DIR}/daemon.log"
 PORT=5757
 
 echo "============================================="
-echo "Initializing Raphael Cognitive Advisor Setup"
+echo "Initializing Raphael Setup"
 echo "============================================="
 
 # 1. Check Python Daemon Executability

@@ -37,7 +37,7 @@ PlasmoidItem {
             anchors.fill: parent; anchors.margins: 12; spacing: 10
 
             Label {
-                text: "RAPHAEL // FLOW MATRIX"
+                text: "RAPHAEL CONTROL"
                 font.family: "Monospace"
                 font.pointSize: 7.5
                 font.bold: true
@@ -69,7 +69,7 @@ PlasmoidItem {
                         anchors.rightMargin: 8
 
                         Label {
-                            text: modelData.name + " //"
+                            text: modelData.name
                             font.family: "Monospace"
                             font.pointSize: 7
                             font.bold: true
@@ -103,19 +103,19 @@ PlasmoidItem {
 
             Rectangle { Layout.fillWidth: true; height: 1; color: "#313244" }
 
-            // --- CHRONOS TIMING CONFIGURATION MATRIX ---
+            // --- RESPONSE DELAY SETTINGS ---
             ColumnLayout {
-                id: chronosRatioProtocolsLayout
+                id: delaySettingsLayout
                 Layout.fillWidth: true; spacing: 6
                 Label {
-                    text: "CHRONOS RATIO PROTOCOLS"
+                    text: "RESPONSE DELAYS"
                     font.family: "Monospace"
                     font.bold: true
                     font.pointSize: 7.5
                     color: "#ca9ee6"
                 }
 
-                function syncDelayMatrix() {
+                function syncDelays() {
                     var doc = new XMLHttpRequest();
                     doc.open("POST", "http://127.0.0.1:5757/update_delays", true);
                     doc.setRequestHeader("Content-Type", "application/json");
@@ -136,7 +136,7 @@ PlasmoidItem {
                         Slider {
                             id: quotesSlider
                             Layout.fillWidth: true; from: 0.0; to: 5.0; stepSize: 0.5; value: 0.0
-                            onMoved: chronosRatioProtocolsLayout.syncDelayMatrix()
+                            onMoved: delaySettingsLayout.syncDelays()
                             background: Rectangle { x: quotesSlider.leftPadding; y: quotesSlider.topPadding + quotesSlider.availableHeight / 2 - height / 2; width: quotesSlider.availableWidth; height: 4; radius: 2; color: "#313244"; Rectangle { width: quotesSlider.visualPosition * parent.width; height: parent.height; color: "#cba6f7"; radius: 2 } }
                             handle: Rectangle { x: quotesSlider.leftPadding + quotesSlider.visualPosition * (quotesSlider.availableWidth - width); y: quotesSlider.topPadding + quotesSlider.availableHeight / 2 - height / 2; width: 10; height: 10; radius: 5; color: "#cdd6f4"; border.color: "#cba6f7"; border.width: 1 }
                         }
@@ -150,7 +150,7 @@ PlasmoidItem {
                         Slider {
                             id: sarcasmSlider
                             Layout.fillWidth: true; from: 0.0; to: 5.0; stepSize: 0.5; value: 1.5
-                            onMoved: chronosRatioProtocolsLayout.syncDelayMatrix()
+                            onMoved: delaySettingsLayout.syncDelays()
                             background: Rectangle { x: sarcasmSlider.leftPadding; y: sarcasmSlider.topPadding + sarcasmSlider.availableHeight / 2 - height / 2; width: sarcasmSlider.availableWidth; height: 4; radius: 2; color: "#313244"; Rectangle { width: sarcasmSlider.visualPosition * parent.width; height: parent.height; color: "#cba6f7"; radius: 2 } }
                             handle: Rectangle { x: sarcasmSlider.leftPadding + sarcasmSlider.visualPosition * (sarcasmSlider.availableWidth - width); y: sarcasmSlider.topPadding + sarcasmSlider.availableHeight / 2 - height / 2; width: 10; height: 10; radius: 5; color: "#cdd6f4"; border.color: "#cba6f7"; border.width: 1 }
                         }
@@ -164,7 +164,7 @@ PlasmoidItem {
                         Slider {
                             id: angerSlider
                             Layout.fillWidth: true; from: 0.0; to: 5.0; stepSize: 0.5; value: 0.5
-                            onMoved: chronosRatioProtocolsLayout.syncDelayMatrix()
+                            onMoved: delaySettingsLayout.syncDelays()
                             background: Rectangle { x: angerSlider.leftPadding; y: angerSlider.topPadding + angerSlider.availableHeight / 2 - height / 2; width: angerSlider.availableWidth; height: 4; radius: 2; color: "#313244"; Rectangle { width: angerSlider.visualPosition * parent.width; height: parent.height; color: "#cba6f7"; radius: 2 } }
                             handle: Rectangle { x: angerSlider.leftPadding + angerSlider.visualPosition * (angerSlider.availableWidth - width); y: angerSlider.topPadding + angerSlider.availableHeight / 2 - height / 2; width: 10; height: 10; radius: 5; color: "#cdd6f4"; border.color: "#cba6f7"; border.width: 1 }
                         }
@@ -178,7 +178,7 @@ PlasmoidItem {
                         Slider {
                             id: repliesSlider
                             Layout.fillWidth: true; from: 0.0; to: 5.0; stepSize: 0.5; value: 1.0
-                            onMoved: chronosRatioProtocolsLayout.syncDelayMatrix()
+                            onMoved: delaySettingsLayout.syncDelays()
                             background: Rectangle { x: repliesSlider.leftPadding; y: repliesSlider.topPadding + repliesSlider.availableHeight / 2 - height / 2; width: repliesSlider.availableWidth; height: 4; radius: 2; color: "#313244"; Rectangle { width: repliesSlider.visualPosition * parent.width; height: parent.height; color: "#cba6f7"; radius: 2 } }
                             handle: Rectangle { x: repliesSlider.leftPadding + repliesSlider.visualPosition * (repliesSlider.availableWidth - width); y: repliesSlider.topPadding + repliesSlider.availableHeight / 2 - height / 2; width: 10; height: 10; radius: 5; color: "#cdd6f4"; border.color: "#cba6f7"; border.width: 1 }
                         }
@@ -192,7 +192,7 @@ PlasmoidItem {
                         Slider {
                             id: proactiveSlider
                             Layout.fillWidth: true; from: 0.0; to: 5.0; stepSize: 0.5; value: 2.0
-                            onMoved: chronosRatioProtocolsLayout.syncDelayMatrix()
+                            onMoved: delaySettingsLayout.syncDelays()
                             background: Rectangle { x: proactiveSlider.leftPadding; y: proactiveSlider.topPadding + proactiveSlider.availableHeight / 2 - height / 2; width: proactiveSlider.availableWidth; height: 4; radius: 2; color: "#313244"; Rectangle { width: proactiveSlider.visualPosition * parent.width; height: parent.height; color: "#cba6f7"; radius: 2 } }
                             handle: Rectangle { x: proactiveSlider.leftPadding + proactiveSlider.visualPosition * (proactiveSlider.availableWidth - width); y: proactiveSlider.topPadding + proactiveSlider.availableHeight / 2 - height / 2; width: 10; height: 10; radius: 5; color: "#cdd6f4"; border.color: "#cba6f7"; border.width: 1 }
                         }
@@ -320,10 +320,8 @@ PlasmoidItem {
         
         property double focusEfficiencyRatio: 1.0
         property string focusEfficiencyText: "100% FOCUS"
-        property color focusEfficiencyColor: "#a6e3a1"
-
-        property string sessionSummaryText: "Resuming cognitive timeline parameters..."
-        property string sessionGoalsText: "• Calibrating focus vectors\n• Loading milestones"
+        property string sessionSummaryText: "Loading session summary..."
+        property string sessionGoalsText: "• Loading goals..."
     }
 
     Timer {
@@ -509,7 +507,7 @@ PlasmoidItem {
                     width: 6; height: 6; radius: 3; color: "#cba6f7"
                 }
                 Text {
-                    text: "RAPHAEL // " + (sharedState.currentBadge ? sharedState.currentBadge.toUpperCase() : "QUOTE STREAM")
+                    text: "RAPHAEL: " + (sharedState.currentBadge ? sharedState.currentBadge.toUpperCase() : "QUOTE STREAM")
                     font.family: "Monospace"
                     font.pointSize: 7.5
                     font.bold: true
@@ -643,7 +641,7 @@ PlasmoidItem {
                     }
 
                     Label {
-                        text: "RAPHAEL // COGNITIVE HUD v4.8"
+                        text: "RAPHAEL HUD v4.8"
                         font.family: "Monospace"
                         font.pointSize: 7.5
                         font.bold: true
@@ -749,7 +747,7 @@ PlasmoidItem {
                                 }
                             }
                             Label {
-                                text: sharedState.insightLabel.toUpperCase() + " // " + sharedState.insightSource.toUpperCase()
+                                text: sharedState.insightLabel.toUpperCase() + (sharedState.insightSource ? " - " + sharedState.insightSource.toUpperCase() : "")
                                 font.family: "Monospace"
                                 font.pointSize: 7.5
                                 font.bold: true
@@ -762,7 +760,7 @@ PlasmoidItem {
                             Layout.fillWidth: true
                             spacing: 6
                             Label {
-                                text: "TARGET //"
+                                text: "WINDOW:"
                                 font.family: "Monospace"
                                 font.pointSize: 7
                                 font.bold: true
@@ -793,7 +791,7 @@ PlasmoidItem {
                         }
 
                         Text {
-                            text: rightInsightPanel.isTextExpanded ? "[ COLLAPSE TELEMETRY ▲ ]" : "[ EXPAND TELEMETRY ▼ ]"
+                            text: rightInsightPanel.isTextExpanded ? "[ COLLAPSE DETAILS ▲ ]" : "[ EXPAND DETAILS ▼ ]"
                             font.family: "Monospace"
                             font.pointSize: 7.5
                             font.bold: true
@@ -857,7 +855,7 @@ PlasmoidItem {
                             width: 85; height: 22; color: Qt.rgba(0.07, 0.07, 0.11, 0.6); radius: 4; border.color: "#f38ba8"; border.width: 1
                             Label {
                                 anchors.centerIn: parent
-                                text: "SLACK: " + sharedState.liveDistractCounter
+                                text: "OFF-TASK: " + sharedState.liveDistractCounter
                                 font.family: "Monospace"
                                 font.pointSize: 7.5; font.bold: true; color: "#f38ba8"
                             }
@@ -865,7 +863,7 @@ PlasmoidItem {
                     }
                 }
 
-                // --- COGNITIVE EFFICIENCY PROGRESS METERS ---
+                // --- FOCUS EFFICIENCY PROGRESS METERS ---
                 ColumnLayout {
                     Layout.fillWidth: true
                     spacing: 4
@@ -873,7 +871,7 @@ PlasmoidItem {
                     RowLayout {
                         Layout.fillWidth: true
                         Label {
-                            text: "COGNITIVE EFFICIENCY"
+                            text: "FOCUS EFFICIENCY"
                             font.family: "Monospace"
                             font.pointSize: 7.5
                             font.bold: true
@@ -973,7 +971,7 @@ PlasmoidItem {
                                         anchors.margins: 4
                                         spacing: 8
 
-                                        // Historical Session Log Cockpit Panel
+                                        // Historical Session Log Panel
                                         Rectangle {
                                             Layout.fillWidth: true
                                             implicitHeight: summaryCol.implicitHeight + 20
@@ -991,7 +989,7 @@ PlasmoidItem {
                                                 spacing: 4
 
                                                 Label {
-                                                    text: "LOG // HISTORICAL CONTEXT"
+                                                    text: "HISTORICAL CONTEXT"
                                                     font.family: "Monospace"
                                                     font.pointSize: 7
                                                     font.bold: true
@@ -1010,7 +1008,7 @@ PlasmoidItem {
                                             }
                                         }
 
-                                        // Tactical Session Targets Cockpit Panel
+                                        // Session Targets Panel
                                         Rectangle {
                                             Layout.fillWidth: true
                                             implicitHeight: targetCol.implicitHeight + 20
@@ -1028,7 +1026,7 @@ PlasmoidItem {
                                                 spacing: 4
 
                                                 Label {
-                                                    text: "DIR // TACTICAL SESSION TARGETS"
+                                                    text: "SESSION TARGETS"
                                                     font.family: "Monospace"
                                                     font.pointSize: 7
                                                     font.bold: true
@@ -1133,7 +1131,7 @@ PlasmoidItem {
                             TextField {
                                 id: chatInputField
                                 Layout.fillWidth: true
-                                placeholderText: "ENTER COMMAND / COMMUNICATE..."
+                                placeholderText: "Type a message..."
                                 placeholderTextColor: "#585b70"
                                 font.family: "Monospace"
                                 font.pointSize: 9
@@ -1161,7 +1159,7 @@ PlasmoidItem {
 
                                 Text {
                                     anchors.centerIn: parent
-                                    text: "RUN"
+                                    text: "SEND"
                                     color: chatInputField.activeFocus ? "#11111b" : "#cdd6f4"
                                     font.family: "Monospace"
                                     font.bold: true
@@ -1270,7 +1268,7 @@ PlasmoidItem {
                 RowLayout {
                     Layout.fillWidth: true
                     Label {
-                        text: "WARNING // COGNITIVE BREACH INTERCEPTED"
+                        text: "DISTRACTION DETECTED"
                         font.family: "Monospace"
                         font.pointSize: 9.5
                         font.bold: true
@@ -1282,7 +1280,7 @@ PlasmoidItem {
                         width: 110; height: 24; color: Qt.rgba(0.07, 0.07, 0.11, 0.6); radius: 3; border.color: "#f38ba8"; border.width: 1
                         Label {
                             anchors.centerIn: parent
-                            text: "DIVERGENT: " + sharedState.liveDistractCounter
+                            text: "OFF-TASK: " + sharedState.liveDistractCounter
                             font.family: "Monospace"
                             font.pointSize: 7.5; font.bold: true; color: "#f38ba8"
                         }
@@ -1290,7 +1288,7 @@ PlasmoidItem {
                 }
 
                 Label {
-                    text: "CRITICAL ALERT: Target shifted focus to '" + sharedState.sensorScreen + "'."
+                    text: "Focus shifted to '" + sharedState.sensorScreen + "'."
                     font.family: "Monospace"
                     font.pointSize: 9.5
                     color: "#a6adc8"
@@ -1318,7 +1316,7 @@ PlasmoidItem {
                     TextField {
                         id: overlayInputField
                         Layout.fillWidth: true
-                        placeholderText: "STATE JUSTIFICATION PROTOCOL..."
+                        placeholderText: "Explain your focus change..."
                         placeholderTextColor: "#585b70"
                         font.family: "Monospace"
                         font.pointSize: 10

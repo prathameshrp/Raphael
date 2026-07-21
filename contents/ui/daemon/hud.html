@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAPHAEL HUD v4.8</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --card-bg: rgba(15, 23, 42, 0.88);
+            --card-border: rgba(148, 163, 184, 0.2);
+            --border-glow: rgba(56, 189, 248, 0.3);
+            --accent-cyan: #38bdf8;
+            --accent-green: #4ade80;
+            --accent-purple: #c084fc;
+            --accent-pink: #f472b6;
+            --accent-gold: #fbbf24;
+            --text-light: #f8fafc;
+            --text-sub: #94a3b8;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #060911 radial-gradient(circle at 50% 30%, #1e1b4b 0%, #060911 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* Widget Container matching QML layout */
+        .hud-widget {
+            width: 440px;
+            background: rgba(13, 18, 30, 0.92);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 12px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6), 0 0 1px rgba(56, 189, 248, 0.2);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        /* Title Header */
+        .hud-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+        }
+
+        .hud-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-light);
+            letter-spacing: 0.5px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent-green);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--accent-green);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-chat {
+            background: rgba(251, 191, 36, 0.12);
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            color: var(--accent-gold);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 3px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .close-btn {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .close-btn:hover { color: #f87171; }
+
+        /* Workspace Observation Box */
+        .observation-box {
+            background: rgba(15, 23, 42, 0.75);
+            border: 1px solid rgba(56, 189, 248, 0.25);
+            border-radius: 8px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .obs-title {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .obs-window {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            line-height: 1.3;
+        }
+        .obs-window span {
+            color: var(--accent-gold);
+            font-weight: 600;
+        }
+
+        .obs-body {
+            font-size: 0.84rem;
+            color: var(--text-sub);
+            line-height: 1.4;
+        }
+
+        .expand-toggle {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.72rem;
+            color: var(--accent-cyan);
+            cursor: pointer;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            user-select: none;
+        }
+        .expand-toggle:hover { text-decoration: underline; }
+
+        .details-panel {
+            display: none;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px dashed rgba(148, 163, 184, 0.2);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.72rem;
+            color: var(--text-sub);
+        }
+
+        /* Status Pills Row */
+        .pills-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+
+        .pill {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pill-focus-mode {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.4);
+            color: var(--accent-gold);
+        }
+
+        .pill-focus-time {
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid rgba(74, 222, 128, 0.4);
+            color: var(--accent-green);
+        }
+
+        .pill-offtask {
+            background: rgba(244, 114, 182, 0.1);
+            border: 1px solid rgba(244, 114, 182, 0.4);
+            color: var(--accent-pink);
+        }
+
+        /* Focus Efficiency Progress Bar */
+        .efficiency-container {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .efficiency-header {
+            display: flex;
+            justify-content: space-between;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.72rem;
+            color: var(--accent-cyan);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 95%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        /* Session Card */
+        .session-card {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            border-radius: 8px;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .session-summary-text {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            font-style: italic;
+        }
+
+        .targets-box {
+            background: rgba(10, 15, 26, 0.8);
+            border: 1px solid rgba(56, 189, 248, 0.2);
+            border-radius: 6px;
+            padding: 8px 10px;
+        }
+
+        .targets-title {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            color: var(--accent-cyan);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .targets-list {
+            font-size: 0.78rem;
+            color: var(--text-light);
+            list-style: none;
+            padding-left: 2px;
+        }
+        .targets-list li {
+            margin-bottom: 2px;
+        }
+
+        /* Chat History Stream */
+        .chat-stream {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 2px;
+        }
+
+        .chat-bubble {
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.83rem;
+            line-height: 1.4;
+        }
+
+        .chat-user {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(56, 189, 248, 0.3);
+            color: var(--text-light);
+        }
+        .chat-user-header {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent-cyan);
+            margin-bottom: 4px;
+        }
+
+        .chat-raphael {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(192, 132, 252, 0.35);
+            color: var(--text-light);
+        }
+        .chat-raphael-header {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent-purple);
+            margin-bottom: 4px;
+        }
+
+        /* Input Row */
+        .input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: var(--text-light);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.83rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .chat-input:focus {
+            border-color: var(--accent-cyan);
+        }
+
+        .send-btn {
+            background: rgba(51, 65, 85, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.3);
+            color: var(--text-light);
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .send-btn:hover {
+            background: rgba(14, 165, 233, 0.3);
+            border-color: var(--accent-cyan);
+            color: white;
+        }
+
+        /* Footer Telemetry Bar */
+        .hud-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            color: var(--text-sub);
+            padding-top: 6px;
+            border-top: 1px solid rgba(148, 163, 184, 0.15);
+        }
+        .footer-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 135px;
+        }
+        .footer-item span {
+            color: var(--accent-cyan);
+        }
+
+        /* Top Nav Link to Dashboard */
+        .dashboard-link {
+            text-align: center;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.72rem;
+            color: var(--accent-cyan);
+            text-decoration: none;
+            padding-top: 4px;
+        }
+        .dashboard-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <div class="hud-widget">
+        <!-- Title Header -->
+        <div class="hud-header">
+            <div class="hud-title">
+                <div class="status-dot"></div>
+                RAPHAEL HUD v4.8
+            </div>
+            <div class="header-controls">
+                <div class="badge-chat">[ CHAT ACTIVE ]</div>
+                <div class="close-btn" onclick="alert('HUD Minimized')">✕</div>
+            </div>
+        </div>
+
+        <!-- Workspace Observation Box -->
+        <div class="observation-box">
+            <div class="obs-title">
+                ■ WORKSPACE OBSERVATION - LIVE ANALYTICS
+            </div>
+            <div class="obs-window" id="obsWindowLabel">
+                WINDOW: <span>raphael - Antigravity IDE</span>
+            </div>
+            <div class="obs-body" id="obsBodyText">
+                Observing 'raphael - Antigravity IDE'... Stay focused.
+            </div>
+            <div class="expand-toggle" onclick="toggleDetails()">
+                [ EXPAND DETAILS <span id="arrowIcon">▼</span> ]
+            </div>
+            <div class="details-panel" id="detailsPanel">
+                • Process: <code>vscodium / antigravity</code><br>
+                • Window Class: <code>code-oss</code><br>
+                • LLM Model: <code>Groq Llama 3.1 8B Instant</code><br>
+                • Failover Redundancy: <code>Active (Gemini / DeepSeek / OpenAI)</code>
+            </div>
+        </div>
+
+        <!-- Status Pills Row -->
+        <div class="pills-row">
+            <div class="pill pill-focus-mode" id="modePill">MODE: FOCUS</div>
+            <div class="pill pill-focus-time" id="focusPill">FOCUS: 24m 14s</div>
+            <div class="pill pill-offtask" id="offtaskPill">OFF-TASK: 1m 23s</div>
+        </div>
+
+        <!-- Focus Efficiency Progress Bar -->
+        <div class="efficiency-container">
+            <div class="efficiency-header">
+                <span>FOCUS EFFICIENCY</span>
+                <span id="efficiencyText">95% FOCUS</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- Session Card -->
+        <div class="session-card">
+            <div class="session-summary-text" id="sessionSummaryText">
+                Active development session focused on RAPHAEL core backend & HUD APIs...
+            </div>
+            <div class="targets-box">
+                <div class="targets-title">SESSION TARGETS</div>
+                <ul class="targets-list" id="targetsList">
+                    <li>• Implement LLM Load Balancer with HTTP 429 failover</li>
+                    <li>• Serve REST API endpoints at localhost:5757</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Chat Stream -->
+        <div class="chat-stream" id="chatStream">
+            <div class="chat-bubble chat-user">
+                <div class="chat-user-header">&gt; YOU</div>
+                <div>hi</div>
+            </div>
+            <div class="chat-bubble chat-raphael">
+                <div class="chat-raphael-header">&gt; RAPHAEL</div>
+                <div id="latestRaphaelReply">Welcome, Prathamesh! It's great to see you're currently focused on the 'raphael - Antigravity IDE' window.</div>
+            </div>
+        </div>
+
+        <!-- Input Row -->
+        <div class="input-row">
+            <input type="text" class="chat-input" id="chatInput" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+            <button class="send-btn" onclick="sendMessage()">SEND</button>
+        </div>
+
+        <!-- Footer Telemetry Bar -->
+        <div class="hud-footer">
+            <div class="footer-item">• SYS: <span id="sysVal">raphael ...</span></div>
+            <div class="footer-item">• MSC: <span id="mscVal">Nothing ...</span></div>
+            <div class="footer-item">• TME: <span id="tmeVal">24m 14s</span></div>
+        </div>
+
+        <a href="/dashboard" class="dashboard-link">Open Full Telemetry Dashboard &rarr;</a>
+    </div>
+
+    <script>
+        function toggleDetails() {
+            const panel = document.getElementById('detailsPanel');
+            const arrow = document.getElementById('arrowIcon');
+            if (panel.style.display === 'block') {
+                panel.style.display = 'none';
+                arrow.innerText = '▼';
+            } else {
+                panel.style.display = 'block';
+                arrow.innerText = '▲';
+            }
+        }
+
+        async function updateTelemetry() {
+            try {
+                const res = await fetch('/telemetry_v3?caring=3&ai_track=1');
+                const data = await res.json();
+                if (data) {
+                    if (data.active_window) {
+                        const shortWin = data.active_window.length > 32 ? data.active_window.substring(0, 32) + '...' : data.active_window;
+                        document.getElementById('obsWindowLabel').innerHTML = `WINDOW: <span>${shortWin}</span>`;
+                        document.getElementById('obsBodyText').innerText = `Observing '${shortWin}'... Stay focused.`;
+                        document.getElementById('sysVal').innerText = shortWin;
+                    }
+                    if (data.efficiency !== undefined) {
+                        const effPct = Math.round(data.efficiency * 100);
+                        document.getElementById('efficiencyText').innerText = `${effPct}% FOCUS`;
+                        document.getElementById('progressFill').style.width = `${effPct}%`;
+                    }
+                    if (data.quote && data.quote.text) {
+                        document.getElementById('obsBodyText').innerText = data.quote.text;
+                    }
+                }
+            } catch (e) {}
+
+            try {
+                const res = await fetch('/api/session_data');
+                const data = await res.json();
+                if (data && data.current_session) {
+                    const secs = data.current_session.focus_seconds || 0;
+                    const mins = Math.floor(secs / 60);
+                    const remSecs = secs % 60;
+                    const timeStr = `${mins}m ${remSecs}s`;
+                    document.getElementById('focusPill').innerText = `FOCUS: ${timeStr}`;
+                    document.getElementById('tmeVal').innerText = timeStr;
+
+                    if (data.goals && data.goals.length > 0) {
+                        const listHtml = data.goals.slice(0, 3).map(g => `<li>• ${g.text || g}</li>`).join('');
+                        document.getElementById('targetsList').innerHTML = listHtml;
+                    }
+                }
+            } catch (e) {}
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            const chatStream = document.getElementById('chatStream');
+            
+            // Append User Message
+            const userBubble = document.createElement('div');
+            userBubble.className = 'chat-bubble chat-user';
+            userBubble.innerHTML = `<div class="chat-user-header">&gt; YOU</div><div>${text}</div>`;
+            chatStream.appendChild(userBubble);
+            
+            input.value = '';
+            chatStream.scrollTop = chatStream.scrollHeight;
+
+            // Show Loading Indicator
+            const raphaelBubble = document.createElement('div');
+            raphaelBubble.className = 'chat-bubble chat-raphael';
+            raphaelBubble.innerHTML = `<div class="chat-raphael-header">&gt; RAPHAEL</div><div>Thinking...</div>`;
+            chatStream.appendChild(raphaelBubble);
+            chatStream.scrollTop = chatStream.scrollHeight;
+
+            try {
+                const res = await fetch('/chat_v4', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text })
+                });
+                const data = await res.json();
+                const replyText = data.response || "I hear you. Staying focused on the target window.";
+                raphaelBubble.innerHTML = `<div class="chat-raphael-header">&gt; RAPHAEL</div><div>${replyText}</div>`;
+            } catch (e) {
+                raphaelBubble.innerHTML = `<div class="chat-raphael-header">&gt; RAPHAEL</div><div>Focusing on active tasks. Keep up the good work!</div>`;
+            }
+            chatStream.scrollTop = chatStream.scrollHeight;
+        }
+
+        setInterval(updateTelemetry, 3000);
+        updateTelemetry();
+    </script>
+</body>
+</html>

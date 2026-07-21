@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAPHAEL // COGNITIVE CONTROL MATRIX</title>
+    <title>Raphael Focus Dashboard</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         :root {
             --bg-color: #08080f;
@@ -203,11 +204,52 @@
         }
 
         .ai-content {
-            font-size: 1rem;
+            font-size: 0.95rem;
             line-height: 1.6;
             margin-bottom: 1rem;
-            white-space: pre-wrap;
             font-family: 'Outfit', sans-serif;
+            color: var(--text-main);
+        }
+        .ai-content h1, .ai-content h2, .ai-content h3 {
+            margin-top: 0.8rem;
+            margin-bottom: 0.4rem;
+            font-family: 'Fira Code', monospace;
+            color: var(--accent-purple);
+        }
+        .ai-content h1 { font-size: 1.2rem; }
+        .ai-content h2 { font-size: 1.1rem; color: var(--accent-blue); }
+        .ai-content h3 { font-size: 1.02rem; color: var(--accent-green); }
+        .ai-content p {
+            margin-bottom: 0.6rem;
+            line-height: 1.6;
+        }
+        .ai-content ul, .ai-content ol {
+            margin-left: 1.2rem;
+            margin-bottom: 0.8rem;
+        }
+        .ai-content li {
+            margin-bottom: 0.35rem;
+            line-height: 1.5;
+        }
+        .ai-content strong {
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+        .ai-content code {
+            background: rgba(180, 190, 254, 0.15);
+            color: var(--accent-purple);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85em;
+        }
+        .ai-content blockquote {
+            border-left: 3px solid var(--accent-purple);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.5rem 1rem;
+            margin: 0.75rem 0;
+            border-radius: 0 6px 6px 0;
+            font-style: italic;
             color: var(--text-main);
         }
 
@@ -345,7 +387,7 @@
     <header>
         <div class="logo-container">
             <div class="logo-indicator"></div>
-            <h1>RAPHAEL // COGNITIVE CONTROL MATRIX</h1>
+            <h1>RAPHAEL DASHBOARD</h1>
         </div>
         <div>
             <select class="session-selector" id="sessionSelect" onchange="switchSession()">
@@ -368,7 +410,7 @@
             <div class="metric-value" id="efficiencyVal">100%</div>
         </div>
         <div class="metric-card">
-            <div class="metric-label">Telemetry Challenge Count</div>
+            <div class="metric-label">Distraction Challenge Count</div>
             <div class="metric-value" id="challengeCount">0</div>
         </div>
     </div>
@@ -552,24 +594,23 @@
 
         function renderAiInsights(rawText) {
             const container = document.getElementById('aiFeedback');
-            container.innerHTML = '';
-            
-            // Format bullet points
-            const lines = rawText.split('\n');
-            lines.forEach(line => {
-                const trimmed = line.trim();
-                if (trimmed.startsWith('-') || trimmed.startsWith('*') || /^\d+\./.test(trimmed) || trimmed.includes(':')) {
-                    const item = document.createElement('div');
-                    item.className = 'ai-insight-item';
-                    item.textContent = trimmed.replace(/^[-*\d.]\s*/, '');
-                    container.appendChild(item);
-                } else if (trimmed) {
-                    const p = document.createElement('p');
-                    p.style.marginBottom = '0.5rem';
-                    p.textContent = trimmed;
-                    container.appendChild(p);
-                }
-            });
+            if (!rawText) {
+                container.innerHTML = '<em>Click the button above to request real-time, personalized workspace feedback from Raphael.</em>';
+                return;
+            }
+            if (window.marked && typeof marked.parse === 'function') {
+                container.innerHTML = marked.parse(rawText);
+            } else {
+                let html = rawText
+                    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+                    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+                    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                    .replace(/\*(.*?)\*/g, '<em>$1</em>')
+                    .replace(/`(.*?)`/g, '<code>$1</code>')
+                    .replace(/^\s*[-*]\s+(.*$)/gim, '<div class="ai-insight-item">• $1</div>');
+                container.innerHTML = html;
+            }
         }
 
         async function requestAiInsight() {
